@@ -206,8 +206,9 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	@Override
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props)
 			throws BeansException {
-
+		// <1> 创建 StringValueResolver 对象，用于解析 String 值
 		StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(props);
+		// <2> 处理
 		doProcessProperties(beanFactoryToProcess, valueResolver);
 	}
 
@@ -215,7 +216,7 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
 
 		private final PropertyPlaceholderHelper helper;
-
+		//已经解析的 Properties 实例对象
 		private final PlaceholderResolver resolver;
 
 		public PlaceholderResolvingStringValueResolver(Properties props) {
@@ -227,10 +228,13 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 		@Override
 		@Nullable
 		public String resolveStringValue(String strVal) throws BeansException {
+			// 解析真值
 			String resolved = this.helper.replacePlaceholders(strVal, this.resolver);
+			// trim
 			if (trimValues) {
 				resolved = resolved.trim();
 			}
+			// 返回真值
 			return (resolved.equals(nullValue) ? null : resolved);
 		}
 	}
@@ -246,6 +250,7 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 
 		@Override
 		@Nullable
+		//返回占位符的替换值
 		public String resolvePlaceholder(String placeholderName) {
 			return PropertyPlaceholderConfigurer.this.resolvePlaceholder(placeholderName,
 					this.props, systemPropertiesMode);

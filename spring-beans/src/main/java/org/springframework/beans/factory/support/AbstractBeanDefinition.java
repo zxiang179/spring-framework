@@ -576,9 +576,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #AUTOWIRE_AUTODETECT
 	 * @see #AUTOWIRE_CONSTRUCTOR
 	 * @see #AUTOWIRE_BY_TYPE
+	 * 注入模式
 	 */
 	public int getResolvedAutowireMode() {
-		if (this.autowireMode == AUTOWIRE_AUTODETECT) {
+		if (this.autowireMode == AUTOWIRE_AUTODETECT) { // 自动检测模式，获得对应的检测模式
 			// Work out whether to apply setter autowiring or constructor autowiring.
 			// If it has a no-arg constructor it's deemed to be setter autowiring,
 			// otherwise we'll try constructor autowiring.
@@ -1094,12 +1095,15 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Validate and prepare the method overrides defined for this bean.
 	 * Checks for existence of a method with the specified name.
 	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 如果存在 methodOverrides ，则获取所有的 override method ，
+	 * 然后通过迭代的方法一次调用 #prepareMethodOverride(MethodOverride mo) 方法
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
 		// Check that lookup methods exists.
 		if (hasMethodOverrides()) {
 			Set<MethodOverride> overrides = getMethodOverrides().getOverrides();
-			synchronized (overrides) {
+			synchronized (overrides) { // 同步
+				// 循环，执行 prepareMethodOverride
 				for (MethodOverride mo : overrides) {
 					prepareMethodOverride(mo);
 				}
@@ -1113,6 +1117,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * marking it as not overloaded if none found.
 	 * @param mo the MethodOverride object to validate
 	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 根据方法名称，从 class 中获取该方法名的个数：
+	 * 如果个数为 0 ，则抛出 BeanDefinitionValidationException 异常。
+	 * 如果个数为 1 ，则设置该重载方法没有被重载。
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
